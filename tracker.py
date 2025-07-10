@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
-
 import os
+import sys
 import csv
 import argparse
 from datetime import datetime
-
-
 
 class Tracker:
     def __init__(self):
@@ -18,7 +16,8 @@ class Tracker:
             "Focus quaility" : None,
             "Mental energy" : None,
             "Social drive/ease" : None,
-            "Sleep quality" : None
+            "Sleep quality" : None,
+            "Microdosing": None
             }
         
         self.stats = {}
@@ -30,14 +29,21 @@ class Tracker:
 
         # collect data 
         while i < len(ms):
-            try:
-                value = float(input(f"{ms[i]}: 1-10: "))
-                self.metrics[ms[i]] = value
-                i += 1
-            except:
-                print("Enter a numerical value...")
-                continue
 
+            # log data and enable program interuption
+            try:
+                value = input(f"{ms[i]}: 1-10 or 'quit': ")
+                # catch quit
+                if value.lower().strip() == "q":
+                    print("\nLog process interupted... exiting program.")
+                    sys.exit(0)
+                else:
+                    self.metrics[ms[i]] = float(value)
+                    i += 1
+
+            except ValueError:
+                print("Enter a numerical value or 'q' to quit...")
+                continue
         
         # transform data into log format
         for value in self.metrics.values():
@@ -63,7 +69,13 @@ class Tracker:
     def test():
         pass
     
-    def get_stats():
+    def get_stats(self, t_window=5):
+        """Per metric we show:
+            - Initial measurment 
+            - Average
+            - Running average (default is window of 5)
+            - Weighted average with exponential decay
+        """
         pass
 
     def display_stats():
@@ -84,6 +96,16 @@ def main():
                         help="Run a small dummy test for login and displaying data")
     
     args = parser.parse_args()
+
+    if not any([args.log, args.stats, args.test]):
+        print("""No arguments where give...
+              
+            Intended use:
+            
+            tracker [-h] [--log] [--stats] [-test]
+            
+            For more information use the [-h] (help) argument.
+            """)
 
     tracker = Tracker()
 
